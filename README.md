@@ -1,6 +1,6 @@
 ## What is it
 
-This repository contains source codes for the article on [Habr](https://habr.com) (non-published) about different methods to build wasm-module from c++, AssemblyScript and Rust.
+This repository contains source codes for the article on [Habr](https://habr.com) (non-published) about different methods to build wasm-module from c++, AssemblyScript and Rust. These modules build the Delaunay triangulation of the plain. We use a port of [this](https://github.com/darkskyapp/delaunay-fast) algorithm.
 
 ## How to build
 
