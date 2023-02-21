@@ -35,10 +35,10 @@ function build_supertriangle(points: StaticArray<Point>): StaticArray<Point> {
 
     for (let i = 0, len = points.length; i < len; i++) {
         const p = points[i];
-        if (p.x < x_min) { x_min = p.x; }
-        if (p.x > x_max) { x_max = p.x; }
-        if (p.y < y_min) { y_min = p.y; }
-        if (p.y > y_max) { y_max = p.y; }
+        if (p.x < x_min) x_min = p.x;
+        if (p.x > x_max) x_max = p.x;
+        if (p.y < y_min) y_min = p.y;
+        if (p.y > y_max) y_max = p.y;
     }
 
     const dx = x_max - x_min;
@@ -155,7 +155,7 @@ function remove_duplicates(edges: StaticArray<i32>, in_length: i32): i32 {
 }
 
 function remove_from_array<T>(array: StaticArray<T>, in_length: i32, remove_index: i32): i32 {
-    for(let i = remove_index + 1; i < in_length; i++) {
+    for (let i = remove_index + 1; i < in_length; i++) {
         array[i - 1] = array[i];
     }
     return in_length - 1;
@@ -187,7 +187,7 @@ export function triangulate(in_points: StaticArray<Point>): StaticArray<i32> {
 
     // create copy of the input points array and extend it by points from the super triangle
     const points = new StaticArray<Point>(points_count + 3);
-    for(let i = 0; i < points_count; i++) {
+    for (let i = 0; i < points_count; i++) {
         points[i] = in_points[i];
     }
     points[points_count + 0] = st[0];
