@@ -69,8 +69,8 @@ function circumcircle(points: StaticArray<Point>, i: i32, j: i32, k: i32): Trian
     const x_3 = point_k.x;
     const y_3 = point_k.y;
 
-    const y1_y2 = Mathf.abs(y_1, y_2);
-    const y2_y3 = Mathf.abs(y_2, y_3);
+    const y1_y2 = Mathf.abs(y_1 - y_2);
+    const y2_y3 = Mathf.abs(y_2 - y_3);
 
     let center_x: f32 = 0;
     let center_y: f32 = 0;

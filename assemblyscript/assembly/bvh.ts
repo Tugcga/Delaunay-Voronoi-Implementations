@@ -49,26 +49,26 @@ export class Triangle {
         let x_max = f32.MIN_VALUE;
         let y_max = f32.MIN_VALUE;
 
-        let x_accum: f32 = 0;
-        let y_accum: f32 = 0;
+        if (a.x < x_min) { x_min = a.x; }
+        if (a.x > x_max) { x_max = a.x; }
+        if (a.y < y_min) { y_min = a.y; }
+        if (a.y > y_max) { y_max = a.y; }
 
-        for (let i = 0, len = vertices.length; i < len; i++) {
-            const v = vertices[i];
-            if (v.x < x_min) { x_min = v.x; }
-            if (v.x > x_max) { x_max = v.x; }
-            if (v.y < y_min) { y_min = v.y; }
-            if (v.y > y_max) { y_max = v.y; }
+        if (b.x < x_min) { x_min = b.x; }
+        if (b.x > x_max) { x_max = b.x; }
+        if (b.y < y_min) { y_min = b.y; }
+        if (b.y > y_max) { y_max = b.y; }
 
-            x_accum += v.x;
-            y_accum += v.y;
-        }
+        if (c.x < x_min) { x_min = c.x; }
+        if (c.x > x_max) { x_max = c.x; }
+        if (c.y < y_min) { y_min = c.y; }
+        if (c.y > y_max) { y_max = c.y; }
 
-        let inv_len = 1.0 / <f32>vertices.length;
+        let cx = (a.x + b.x + c.x) * (1.0 / 3.0);
+        let cy = (a.y + b.y + c.y) * (1.0 / 3.0);
+
         this.aabb = new AABB(x_min, y_min, x_max, y_max);
-        this.center = new Point(
-            x_accum * inv_len,
-            y_accum * inv_len
-        );
+        this.center = new Point(cx, cy);
     }
 
     is_point_inside(point: Point): bool {
