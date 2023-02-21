@@ -27,7 +27,7 @@ emcc .\delaunay_api.cpp output\libs\delaunay.o output\libs\bvh.o -o output/delau
 It requires [AssemblyScript](https://www.assemblyscript.org/)
 
 ```
-asc assembly/delaunay_api.ts -o build/delaunay.wasm --bindings esm --optimizeLevel 3 --converge --noAssert -Ospeed
+asc assembly/delaunay_api.ts -o build/delaunay.wasm --bindings esm -O --converge --noAssert --uncheckedBehavior always
 ```
 
 ### Rust
