@@ -175,7 +175,7 @@ export function triangulate(in_points: StaticArray<Point>): StaticArray<i32> {
     }
 
     // sort by using custom comparator
-    ext_points.sort((a, b) => i32(a.x < b.x) - i32(a.x > b.x));
+    ext_points.sort((a, b) => i32(a.x > b.x) - i32(a.x < b.x));
 
     // extract indices from sorted array
     let indices = new StaticArray<i32>(points_count);
