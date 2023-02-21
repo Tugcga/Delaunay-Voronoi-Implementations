@@ -35,10 +35,12 @@ function build_supertriangle(points: StaticArray<Point>): StaticArray<Point> {
 
     for (let i = 0, len = points.length; i < len; i++) {
         const p = points[i];
-        if (p.x < x_min) x_min = p.x;
-        if (p.x > x_max) x_max = p.x;
-        if (p.y < y_min) y_min = p.y;
-        if (p.y > y_max) y_max = p.y;
+        const px = p.x;
+        const py = p.y;
+        if (px < x_min) x_min = px;
+        if (px > x_max) x_max = px;
+        if (py < y_min) y_min = py;
+        if (py > y_max) y_max = py;
     }
 
     const dx = x_max - x_min;

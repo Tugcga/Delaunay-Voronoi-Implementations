@@ -72,12 +72,16 @@ export class Triangle {
     }
 
     is_point_inside(point: Point): bool {
-        const ax = this.a.x;
-        const ay = this.a.y;
-        const bx = this.b.x;
-        const by = this.b.y;
-        const cx = this.c.x;
-        const cy = this.c.y;
+        const a = this.a;
+        const b = this.b;
+        const c = this.c;
+
+        const ax = a.x;
+        const ay = a.y;
+        const bx = b.x;
+        const by = b.y;
+        const cx = c.x;
+        const cy = c.y;
         const px = point.x;
         const py = point.y;
 
