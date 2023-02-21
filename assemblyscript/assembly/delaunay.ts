@@ -1,6 +1,6 @@
 import { Point } from "./point";
 
-const EPSILON: f32 = 1e-4;
+const EPSILON: f32 = 1e-5;
 
 class PointExt extends Point {
     public index: i32;

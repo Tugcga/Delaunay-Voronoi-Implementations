@@ -177,10 +177,7 @@ export class BVHNode {
             let left_node  = new BVHNode(left.slice<StaticArray<Triangle>>(0, left_length));
             let right_node = new BVHNode(right.slice<StaticArray<Triangle>>(0, right_length));
 
-            const left_aabb  = left_node.aabb;
-            const right_aabb = right_node.aabb;
-
-            this.aabb = left_aabb.union(right_aabb);
+            this.aabb = left_node.aabb.union(right_node.aabb);
             this.left_node  = left_node;
             this.right_node = right_node;
         }
