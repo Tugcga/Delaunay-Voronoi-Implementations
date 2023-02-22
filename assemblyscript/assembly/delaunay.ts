@@ -50,11 +50,11 @@ function build_supertriangle(points: StaticArray<Point>): StaticArray<Point> {
     const x_mid = x_min + dx * 0.5;
     const y_mid = y_min + dy * 0.5;
 
-    const vertices = new StaticArray<Point>(3);
-    vertices[0] = new Point(x_mid - 20.0 * d_max, y_mid - d_max);
-    vertices[1] = new Point(x_mid, y_mid + 20.0 * d_max);
-    vertices[2] = new Point(x_mid + 20.0 * d_max, y_mid - d_max);
-    return vertices;
+    return [
+        new Point(x_mid - 20.0 * d_max, y_mid - d_max),
+        new Point(x_mid, y_mid + 20.0 * d_max),
+        new Point(x_mid + 20.0 * d_max, y_mid - d_max)
+    ];
 }
 
 function circumcircle(points: StaticArray<Point>, i: i32, j: i32, k: i32): TriangleCircle {
@@ -166,7 +166,7 @@ function remove_from_array<T>(array: StaticArray<T>, in_length: i32, remove_inde
 export function triangulate(in_points: StaticArray<Point>): StaticArray<i32> {
     const points_count = in_points.length;
     if (points_count < 3) {
-        return new StaticArray<i32>(0);
+        return [];
     }
 
     // AS does not support closures, so, create array with extended points
