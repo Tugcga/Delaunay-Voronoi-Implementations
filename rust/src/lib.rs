@@ -35,17 +35,23 @@ impl BVHNodeWrapper {
         let points_count = coordinates.len() / 2;
         let mut points: Vec<Point> = Vec::with_capacity(points_count);
         for i in 0..points_count {
-            points.push(Point::new(coordinates[2*i], coordinates[2*i + 1]));
+            points.push(Point::new(coordinates[2 * i + 0], coordinates[2 * i + 1]));
         }
 
         let triangle_indices = triangulate(&points);
 
         let mut triangles: Vec<Triangle> = Vec::with_capacity(triangle_indices.len() / 3);
         for i in 0..(triangle_indices.len() / 3) {
-            let a = triangle_indices[3*i];
-            let b = triangle_indices[3*i + 1];
-            let c = triangle_indices[3*i + 2];
-            triangles.push(Triangle::new(vec!(points[a].clone(), points[b].clone(), points[c].clone())));
+            let a = triangle_indices[3 * i + 0];
+            let b = triangle_indices[3 * i + 1];
+            let c = triangle_indices[3 * i + 2];
+            triangles.push(
+                Triangle::new(
+                    points[a].clone(),
+                    points[b].clone(),
+                    points[c].clone()
+                )
+            );
         }
 
         BVHNodeWrapper {
@@ -57,11 +63,17 @@ impl BVHNodeWrapper {
         let triangles_count = triangles.len() / 3;
         let mut triangles_array: Vec<Triangle> = Vec::with_capacity(triangles_count);
         for i in 0..triangles_count {
-            let a = triangles[3*i] as usize;
-            let b = triangles[3*i + 1] as usize;
-            let c = triangles[3*i + 2] as usize;
+            let a = triangles[3 * i + 0] as usize;
+            let b = triangles[3 * i + 1] as usize;
+            let c = triangles[3 * i + 2] as usize;
 
-            triangles_array.push(Triangle::new(vec!(Point::new(coordinates[2*a], coordinates[2*a + 1]), Point::new(coordinates[2*b], coordinates[2*b + 1]), Point::new(coordinates[2*c], coordinates[2*c + 1]))));
+            triangles_array.push(
+                Triangle::new(
+                    Point::new(coordinates[2 * a + 0], coordinates[2 * a + 1]),
+                    Point::new(coordinates[2 * b + 0], coordinates[2 * b + 1]),
+                    Point::new(coordinates[2 * c + 0], coordinates[2 * c + 1])
+                )
+            );
         }
 
         BVHNodeWrapper {

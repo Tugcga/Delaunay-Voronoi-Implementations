@@ -2,23 +2,31 @@
 #include "point.h"
 #include <vector>
 
-struct AABB
-{
+struct AABB {
 	float x_min;
 	float y_min;
 	float x_max;
 	float y_max;
 
-	std::string to_string()
-	{
-		return "|" + std::to_string(x_min) + ", " + std::to_string(y_min) + ", " + std::to_string(x_max) + ", " + std::to_string(y_max) + "|";
+	bool is_point_inside(const Point &point) {
+		return x_min < point.x &&
+					 y_min < point.y &&
+					 x_max > point.x &&
+					 y_max > point.y;
+	}
+
+	std::string to_string() {
+		return "|"  + std::to_string(x_min) +
+					 ", " + std::to_string(y_min) +
+					 ", " + std::to_string(x_max) +
+					 ", " + std::to_string(y_max) +
+					 "|";
 	}
 };
 
-class Trinangle
-{
+class Trinangle {
 public:
-	Trinangle(const std::vector<Point>& vertices);
+	Trinangle(const Point &a, const Point &b, const Point &c);
 	~Trinangle() {};
 	AABB get_aabb();
 	Point get_center();
@@ -38,8 +46,7 @@ private:
 	Point center;
 };
 
-class BVHNode
-{
+class BVHNode {
 public:
 	BVHNode(const std::vector<Trinangle*> &triangles);
 	~BVHNode();
