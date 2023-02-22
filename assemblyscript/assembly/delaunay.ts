@@ -2,7 +2,7 @@ import { Point } from "./point";
 
 const EPSILON: f32 = 1e-5;
 
-class PointExt extends Point {
+class IndexedPoint extends Point {
     public index: i32;
     constructor(x: f32, y: f32, index: i32) {
         super(x, y);
@@ -170,19 +170,19 @@ export function triangulate(in_points: StaticArray<Point>): StaticArray<i32> {
     }
 
     // AS does not support closures, so, create array with extended points
-    let ext_points = new StaticArray<PointExt>(points_count);
+    let indexed_points = new StaticArray<IndexedPoint>(points_count);
     for (let i = 0; i < points_count; i++) {
         const p = in_points[i];
-        ext_points[i] = new PointExt(p.x, p.y, i);  // assign in dex to each point
+        indexed_points[i] = new PointExt(p.x, p.y, i);  // assign in dex to each point
     }
 
     // sort by using custom comparator
-    ext_points.sort((a, b) => i32(a.x > b.x) - i32(a.x < b.x));
+    indexed_points.sort((a, b) => i32(a.x > b.x) - i32(a.x < b.x));
 
     // extract indices from sorted array
     let indices = new StaticArray<i32>(points_count);
     for (let i = 0; i < points_count; i++) {
-        indices[i] = ext_points[i].index;
+        indices[i] = indexed_points[i].index;
     }
 
     const st = build_supertriangle(in_points);
