@@ -7,16 +7,14 @@
 
 using namespace emscripten;
 
-emscripten::val build_triangulation(const emscripten::val &in_coordinates)
-{
+emscripten::val build_triangulation(const emscripten::val &in_coordinates) {
 	// prepare input
 	const std::vector<float> coordinates = convertJSArrayToNumberVector<float>(in_coordinates);
 
 	int points_count = coordinates.size() / 2;
 	std::vector<Point> points(points_count);
-	for (size_t i = 0; i < points_count; i++)
-	{
-		points[i] = Point(coordinates[2*i], coordinates[2*i + 1]);
+	for (size_t i = 0; i < points_count; i++) {
+		points[i] = Point(coordinates[2 * i + 0], coordinates[2 * i + 1]);
 	}
 
 	std::vector<int> triangles = triangulate(points);
@@ -29,8 +27,7 @@ emscripten::val build_triangulation(const emscripten::val &in_coordinates)
 	return result;
 }
 
-class BVHNodeWrapper
-{
+class BVHNodeWrapper {
 public:
 	BVHNodeWrapper(const emscripten::val &in_coordinates);
 	BVHNodeWrapper(const emscripten::val &in_coordinates, const emscripten::val &in_triangles);
@@ -42,68 +39,59 @@ private:
 	BVHNode* bvh;
 };
 
-BVHNodeWrapper::BVHNodeWrapper(const emscripten::val &in_coordinates)
-{
+BVHNodeWrapper::BVHNodeWrapper(const emscripten::val &in_coordinates) {
 	const std::vector<float> coordinates = convertJSArrayToNumberVector<float>(in_coordinates);
 
 	int points_count = coordinates.size() / 2;
 	std::vector<Point> points(points_count);
-	for (size_t i = 0; i < points_count; i++)
-	{
-		points[i] = Point(coordinates[2*i], coordinates[2*i + 1]);
+	for (size_t i = 0; i < points_count; i++) {
+		points[i] = Point(coordinates[2 * i + 0], coordinates[2 * i + 1]);
 	}
 
 	std::vector<int> trinagle_indices = triangulate(points);
 	int trinagles_count = trinagle_indices.size() / 3;
 	std::vector<Trinangle*> trinagles(trinagles_count);
-	for (size_t i = 0; i < trinagles_count; i++)
-	{
-		int a = trinagle_indices[3 * i];
+	for (size_t i = 0; i < trinagles_count; i++) {
+		int a = trinagle_indices[3 * i + 0];
 		int b = trinagle_indices[3 * i + 1];
 		int c = trinagle_indices[3 * i + 2];
 
-		std::vector<Point> vertices = { points[a], points[b], points[c] };
-		trinagles[i] = new Trinangle(vertices);
+		trinagles[i] = new Trinangle(points[a], points[b], points[c]);
 	}
 
 	bvh = new BVHNode(trinagles);
 }
 
-BVHNodeWrapper::BVHNodeWrapper(const emscripten::val &in_coordinates, const emscripten::val &in_triangles)
-{
+BVHNodeWrapper::BVHNodeWrapper(const emscripten::val &in_coordinates, const emscripten::val &in_triangles) {
 	const std::vector<float> coordinates = convertJSArrayToNumberVector<float>(in_coordinates);
 	const std::vector<int> triangles = convertJSArrayToNumberVector<int>(in_triangles);
 
 	int triangles_count = triangles.size() / 3;
 	std::vector<Trinangle*> triangles_array(triangles_count);
-	for (size_t i = 0; i < triangles_count; i++)
-	{
-		int a = triangles[3 * i];
+	for (size_t i = 0; i < triangles_count; i++) {
+		int a = triangles[3 * i + 0];
 		int b = triangles[3 * i + 1];
 		int c = triangles[3 * i + 2];
 
-		std::vector<Point> vertices = {
-			Point(coordinates[2 * a], coordinates[2 * a + 1]),
-			Point(coordinates[2 * b], coordinates[2 * b + 1]),
-			Point(coordinates[2 * c], coordinates[2 * c + 1]) };
-		triangles_array[i] = new Trinangle(vertices);
+		triangles_array[i] = new Trinangle(
+			Point(coordinates[2 * a + 0], coordinates[2 * a + 1]),
+			Point(coordinates[2 * b + 0], coordinates[2 * b + 1]),
+			Point(coordinates[2 * c + 0], coordinates[2 * c + 1])
+		);
 	}
 
 	bvh = new BVHNode(triangles_array);
 }
 
-BVHNodeWrapper::~BVHNodeWrapper()
-{
+BVHNodeWrapper::~BVHNodeWrapper() {
 	delete bvh;
 }
 
-emscripten::val BVHNodeWrapper::sample(float x, float y)
-{
+emscripten::val BVHNodeWrapper::sample(float x, float y) {
 	Point p = Point(x, y);
 	Trinangle* s = bvh->sample(p);
 	std::vector<float> to_return(0);
-	if (s)
-	{
+	if (s) {
 		Point a = s->get_a();
 		Point b = s->get_b();
 		Point c = s->get_c();
@@ -118,8 +106,7 @@ emscripten::val BVHNodeWrapper::sample(float x, float y)
 	return result;
 }
 
-EMSCRIPTEN_BINDINGS(delaunay_module)
-{
+EMSCRIPTEN_BINDINGS(delaunay_module) {
 	class_<BVHNodeWrapper>("BVHNode")
 		.constructor<emscripten::val>()
 		.constructor<emscripten::val, emscripten::val>()
