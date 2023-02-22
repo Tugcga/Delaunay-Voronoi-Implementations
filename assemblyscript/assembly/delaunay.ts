@@ -165,7 +165,7 @@ export function triangulate(in_points: StaticArray<Point>): StaticArray<i32> {
     let indexed_points = new StaticArray<IndexedPoint>(points_count);
     for (let i = 0; i < points_count; i++) {
         const p = in_points[i];
-        indexed_points[i] = new PointExt(p.x, p.y, i);  // assign in dex to each point
+        indexed_points[i] = new IndexedPoint(p.x, p.y, i);  // assign in dex to each point
     }
 
     // sort by using custom comparator
