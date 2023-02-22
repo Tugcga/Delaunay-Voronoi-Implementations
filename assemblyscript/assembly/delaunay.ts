@@ -1,14 +1,6 @@
-import { Point } from "./point";
+import { Point, IndexedPoint } from "./point";
 
 const EPSILON: f32 = 1e-5;
-
-class IndexedPoint extends Point {
-    public index: i32;
-    constructor(x: f32, y: f32, index: i32) {
-        super(x, y);
-        this.index = index;
-    }
-}
 
 class TriangleCircle {
     constructor(

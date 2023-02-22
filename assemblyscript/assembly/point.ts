@@ -15,3 +15,11 @@ export class Point {
         return `(${this.x}, ${this.y})`;
     }
 }
+
+export class IndexedPoint extends Point {
+    public index: i32;
+    constructor(x: f32, y: f32, index: i32) {
+        super(x, y);
+        this.index = index;
+    }
+}
