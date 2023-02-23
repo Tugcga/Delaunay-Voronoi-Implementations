@@ -1,23 +1,25 @@
 export class Point {
-    private m_x: f32;
-    private m_y: f32;
-
-    constructor(in_x: f32 = 0.0, in_y: f32 = 0.0) {
-        this.m_x = in_x;
-        this.m_y = in_y;
-    }
+    constructor(
+        public x: f32 = 0,
+        public y: f32 = 0
+    ) {}
 
     @inline
-    x(): f32 {
-        return this.m_x;
-    }
-
-    @inline
-    y(): f32 {
-        return this.m_y;
+    squared_distance(other: Point): f32 {
+        const dx = this.x - other.x;
+        const dy = this.y - other.x;
+        return dx * dx + dy * dy;
     }
 
     toString(): string {
-        return "(" + this.m_x.toString() + ", " + this.m_y.toString() + ")";
+        return `(${this.x}, ${this.y})`;
+    }
+}
+
+export class IndexedPoint extends Point {
+    public index: i32;
+    constructor(x: f32, y: f32, index: i32) {
+        super(x, y);
+        this.index = index;
     }
 }
