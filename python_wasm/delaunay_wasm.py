@@ -16,13 +16,16 @@ class Loader:
 
         imports = ImportObject()
         imports.register("wbg", {
-            "__wbindgen_number_new": Function(store, self._import_number_new),
             "__wbindgen_object_drop_ref": Function(store, self._import_drop_ref),
-            "__wbg_new_b525de17f44a8943": Function(store, self._import_new),
-            "__wbg_newwithlength_0da6f12fbc1ab6eb": Function(store, self._import_new_with_length),
-            "__wbg_set_17224bc548dd1d7b": Function(store, self._import_set),
-            "__wbg_push_49c286f04dd3bf59": Function(store, self._import_push),
+            "__wbg_buffer_cf65c07de34b9a08": Function(store, self._import_buffer),
+            "__wbg_newwithbyteoffsetandlength_5c5a6e21987c3bee": Function(store, self._import_new_with_offset_length),
+            "__wbg_set_b7d17bec8c3f4411": Function(store, self._import_set),
+            "__wbg_length_78f8a40881924c65": Function(store, self._import_length),
+            "__wbg_newwithlength_9e47bf496e7c6f07": Function(store, self._import_new_uint_with_length),
+            "__wbg_newwithlength_563e9b820547b3a8": Function(store, self._import_new_f32_with_length),
+            "__wbg_setindex_6f3d2e7c148e3c86": Function(store, self._import_set_index),
             "__wbindgen_throw": Function(store, self._import_throw),
+            "__wbindgen_memory": Function(store, self._import_memory),
         })
 
         self._wasm = Instance(module, imports)
@@ -47,27 +50,44 @@ class Loader:
             elif export_name == "__wbg_bvhnode_free":
                 self._bvh_free = export_function
 
-    def _import_number_new(self, arg: "f64") -> int:
-        return self._add_heap_object(arg)
+    def _import_drop_ref(self, arg0: int):
+        self._take_object(arg0)
 
-    def _import_drop_ref(self, arg: int):
-        self._take_object(arg)
+    def _import_buffer(self, arg0: int) -> int:
+        ret = self._get_object(arg0)
+        return self._add_heap_object(ret)
 
-    def _import_new(self) -> int:
-        return self._add_heap_object([])
-
-    def _import_new_with_length(self, arg: int) -> int:
-        return self._add_heap_object([None] * arg)
+    def _import_new_with_offset_length(self, arg0: int, arg1: int, arg2: int) -> int:
+        memory_view = self._get_object(arg0).uint32_view(offset=arg1//4)
+        ret = [0] * arg2
+        for i in range(arg2):
+            ret[i] = memory_view[i]
+        return self._add_heap_object(ret)
 
     def _import_set(self, arg0: int, arg1: int, arg2: int):
-        self._get_object(arg0)[arg1] = self._take_object(arg2)
+        self._get_object(arg0)[arg2] = self._get_object(arg1)
 
-    def _import_push(self, arg0: int, arg1: int) -> int:
-        self._get_object(arg0).append(self._get_object(arg1))
-        return len(self._heap)
+    def _import_length(self, arg0: int) -> int:
+        ret = len(self._get_object(arg0))
+        return ret
+
+    def _import_new_uint_with_length(self, arg0: int) -> int:
+        ret = [0] * arg0
+        return self._add_heap_object(ret)
+
+    def _import_new_f32_with_length(self, arg0: int) -> int:
+        ret = [0.0] * arg0
+        return self._add_heap_object(ret)
+
+    def _import_set_index(self, arg0: int, arg1: int, arg2: float):
+        self._get_object(arg0)[arg1] = arg2
 
     def _import_throw(self, arg0: int, arg1: int):
         return "something wrong"
+
+    def _import_memory(self) -> int:
+        ret = self._wasm.exports.memory
+        return self._add_heap_object(ret)
 
     def _add_heap_object(self, obj: int) -> int:
         if self._heap_next == len(self._heap):
@@ -112,8 +132,7 @@ class Loader:
         ptr = self._pass_array_f32_to_wasm(coordinates)
         length = self._wasm_vector_len
         ret = self._build_triangulation(ptr, length)
-        array = self._take_object(ret)
-        return [int(v) for v in array]
+        return self._take_object(ret)[0]
 
 class BVHNode:
     def __init__(self, loader, coordinates: list[float], triangles=None):
