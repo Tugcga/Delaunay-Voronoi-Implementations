@@ -27,36 +27,37 @@ pub struct Triangle {
 }
 
 impl Triangle {
-    pub fn new(mut vertices: Vec<Point>) -> Triangle {
-        let mut x_min: f32 = f32::MAX;
-        let mut y_min: f32 = f32::MAX;
-        let mut x_max: f32 = f32::MIN;
-        let mut y_max: f32 = f32::MIN;
+    pub fn new(a: Point, b: Point, c: Point) -> Triangle {
+        let mut x_min = f32::MAX;
+        let mut y_min = f32::MAX;
+        let mut x_max = f32::MIN;
+        let mut y_max = f32::MIN;
 
-        let mut x_accum: f32 = 0.0;
-        let mut y_accum: f32 = 0.0;
+        if a.x < x_min { x_min = a.x; }
+        if a.x > x_max { x_max = a.x; }
+        if a.y < y_min { y_min = a.y; }
+        if a.y > y_max { y_max = a.y; }
 
-        for i in 0..vertices.len() {
-            let v = &vertices[i];
-            if v.x < x_min { x_min = v.x; }
-            if v.x > x_max { x_max = v.x; }
-            if v.y < y_min { y_min = v.y; }
-            if v.y > y_max { y_max = v.y; }
+        if b.x < x_min { x_min = b.x; }
+        if b.x > x_max { x_max = b.x; }
+        if b.y < y_min { y_min = b.y; }
+        if b.y > y_max { y_max = b.y; }
 
-            x_accum += v.x;
-            y_accum += v.y;
-        }
+        if c.x < x_min { x_min = c.x; }
+        if c.x > x_max { x_max = c.x; }
+        if c.y < y_min { y_min = c.y; }
+        if c.y > y_max { y_max = c.y; }
 
-        let c = vertices.pop().unwrap();
-        let b = vertices.pop().unwrap();
-        let a = vertices.pop().unwrap();
+        let x_c = (a.x + b.x + c.x) / 3.0;
+        let y_c = (a.y + b.y + c.y)  / 3.0;
 
         Triangle {
-            a: a,
-            b: b,
-            c: c,
+            a,
+            b,
+            c,
             aabb: AABB { x_min, y_min, x_max, y_max },
-            center: Point::new(x_accum / 3.0, y_accum / 3.0)}
+            center: Point::new(x_c, y_c)
+        }
     }
 
     fn get_aabb(&self) -> AABB {

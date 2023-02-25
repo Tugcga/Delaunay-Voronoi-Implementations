@@ -131,7 +131,7 @@ fn remove_duplicates(edges: &mut Vec<usize>) {
     }
 }
 
-pub fn triangulate(in_points: &Vec<Point>) -> Vec<usize> {
+pub fn triangulate(in_points: &Vec<Point>) -> Vec<u32> {
     let points_count = in_points.len();
     if points_count < 3 {
         return Vec::new();
@@ -201,13 +201,13 @@ pub fn triangulate(in_points: &Vec<Point>) -> Vec<usize> {
     open_list.clear();
     edges_list.clear();
 
-    let mut triangles: Vec<usize> = Vec::new();
+    let mut triangles: Vec<u32> = Vec::with_capacity(3 * closed_list.len());
     for i in 0..closed_list.len() {
         let t = &closed_list[i];
         if t.i < points_count && t.j < points_count && t.k < points_count {
-            triangles.push(t.i);
-            triangles.push(t.j);
-            triangles.push(t.k);
+            triangles.push(t.i as u32);
+            triangles.push(t.j as u32);
+            triangles.push(t.k as u32);
         }
     }
 
