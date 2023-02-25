@@ -1,6 +1,6 @@
 ## What is it
 
-This repository contains source codes for the article on [Habr](https://habr.com) (non-published) about different methods to build wasm-module from c++, AssemblyScript and Rust. These modules build the Delaunay triangulation of the plain. We use a port of [this](https://github.com/darkskyapp/delaunay-fast) algorithm.
+This repository contains source codes for the article on [Habr](https://habr.com/ru/post/718874/) about different methods to build wasm-module from c++, AssemblyScript and Rust. These modules build the Delaunay triangulation of the plain. We use a port of [this](https://github.com/darkskyapp/delaunay-fast) algorithm.
 
 ## How to build
 
@@ -27,8 +27,10 @@ emcc .\delaunay_api.cpp output\libs\delaunay.o output\libs\bvh.o -o output/delau
 It requires [AssemblyScript](https://www.assemblyscript.org/)
 
 ```
-asc assembly/delaunay_api.ts -o build/delaunay.wasm --bindings esm --optimizeLevel 3 --converge --noAssert -Ospeed
+asc assembly/delaunay_api.ts -o build/delaunay.wasm --bindings esm -O --converge --noAssert
 ```
+
+It's possible to add the additional parameter ```--uncheckedBehavior always```. This will speed up the module at nearly 20%.
 
 ### Rust
 
