@@ -1,18 +1,6 @@
 import { Point } from "./point";
 
 @inline
-function maximum(a: f32, b: f32): f32 {
-    if(a > b) { return a;
-    } else { return b; }
-}
-
-@inline
-function minimum(a: f32, b: f32): f32 {
-    if(a > b) { return b;
-    } else { return a; }
-}
-
-@inline
 function square(value: f32): f32 {
     return value * value;
 }
@@ -44,8 +32,18 @@ class AABB {
     @inline
     y_max(): f32 { return this.m_y_max; }
 
+    @inline
+    union(other: AABB): AABB {
+        return new AABB(
+            Mathf.min(this.m_x_min, other.m_x_min),
+            Mathf.min(this.m_y_min, other.m_y_min),
+            Mathf.max(this.m_x_max, other.m_x_max),
+            Mathf.max(this.m_y_max, other.m_y_max)
+        );
+    }
+
     toString(): string {
-        return "|" + this.m_x_min.toString() + ", " + this.m_y_min.toString() + ", " + this.m_x_max.toString() + ", " + this.m_y_max.toString() + "|";
+        return `|${this.m_x_min}, ${this.m_y_min}, ${this.m_x_max}, ${this.m_y_max}|`;
     }
 }
 
@@ -123,15 +121,8 @@ export class Triangle {
     }
 
     toString(): string {
-        return "<" + this.m_a.toString() + ", " + this.m_b.toString() + ", " + this.m_c.toString() + ">";
+        return `<${this.m_a}, ${this.m_b}, ${this.m_c}>`;
     }
-}
-
-function union_aabb(x: AABB, y: AABB): AABB {
-    return new AABB(minimum(x.x_min(), y.x_min()), 
-    minimum(x.y_min(), y.y_min()), 
-    maximum(x.x_max(), y.x_max()), 
-    maximum(x.y_max(), y.y_max()));
 }
 
 export class BVHNode {
@@ -189,13 +180,13 @@ export class BVHNode {
             if (left_length == 0)
             {
                 left[left_length++] = right[right_length - 1];
-                right_length -= 1;
+                right_length--;
             }
 
             if (right_length == 0)
             {
                 right[right_length++] = left[left_length - 1];
-                left_length -= 1;
+                left_length--;
             }
 
             let left_node = new BVHNode(left.slice<StaticArray<Triangle>>(0, left_length));
@@ -204,7 +195,7 @@ export class BVHNode {
             const left_aabb = left_node.aabb();
             const right_aabb = right_node.aabb();
 
-            this.m_aabb = union_aabb(left_aabb, right_aabb);
+            this.m_aabb = left_aabb.union(right_aabb);
             this.m_left_node = left_node;
             this.m_right_node = right_node;
         }

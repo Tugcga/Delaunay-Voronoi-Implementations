@@ -1,20 +1,6 @@
-import { Point } from "./point";
+import { Point, IndexedPoint } from "./point";
 
 const EPSILON: f32 = 0.0001;
-
-class PointExt extends Point {
-    private m_index: i32;
-
-    constructor(in_x: f32, in_y: f32, in_index: i32) {
-        super(in_x, in_y);
-
-        this.m_index = in_index;
-    }
-
-    index(): i32 {
-        return this.m_index;
-    }
-}
 
 class TriangleCircle {
     private m_i: i32;
@@ -84,15 +70,15 @@ function build_supertriangle(points: StaticArray<Point>): StaticArray<Point> {
     const dx: f32 = x_max - x_min;
     const dy: f32 = y_max - y_min;
 
-    const d_max: f32 = maximum(dx, dy);
+    const d_max: f32 = Mathf.max(dx, dy);
     const x_mid: f32 = x_min + dx * 0.5;
     const y_mid: f32 = y_min + dy * 0.5;
 
-    const vertices = new StaticArray<Point>(3);
-    vertices[0] = new Point(x_mid - 20.0 * d_max, y_mid - d_max);
-    vertices[1] = new Point(x_mid, y_mid + 20.0 * d_max);
-    vertices[2] = new Point(x_mid + 20.0 * d_max, y_mid - d_max);
-    return vertices;
+    return [
+        new Point(x_mid - 20.0 * d_max, y_mid - d_max),
+        new Point(x_mid, y_mid + 20.0 * d_max),
+        new Point(x_mid + 20.0 * d_max, y_mid - d_max)
+    ];
 }
 
 function circumcircle(points: StaticArray<Point>, i: i32, j: i32, k: i32): TriangleCircle {
@@ -109,8 +95,8 @@ function circumcircle(points: StaticArray<Point>, i: i32, j: i32, k: i32): Trian
     const x_3 = point_k.x();
     const y_3 = point_k.y();
 
-    const y1_y2 = absolute(y_1, y_2);
-    const y2_y3 = absolute(y_2, y_3);
+    const y1_y2 = Mathf.abs(y_1 - y_2);
+    const y2_y3 = Mathf.abs(y_2 - y_3);
 
     let center_x: f32 = 0.0;
     let center_y: f32 = 0.0;
@@ -155,16 +141,16 @@ function circumcircle(points: StaticArray<Point>, i: i32, j: i32, k: i32): Trian
 // retun new size of the edges array
 function remove_duplicates(edges: StaticArray<i32>, in_length: i32): i32 {
     let j = in_length;
-    while(j >= 2) {
+    while (j >= 2) {
         const b = edges[--j];
         const a = edges[--j];
 
         let i = j;
-        while(i >= 2) {
+        while (i >= 2) {
             const n = edges[--i];
             const m = edges[--i];
 
-            if((a == m && b == n) || (a == n && b == m)) {
+            if ((a == m && b == n) || (a == n && b == m)) {
                 edges[j] = -1;
                 edges[j + 1] = -1;
 
@@ -180,9 +166,9 @@ function remove_duplicates(edges: StaticArray<i32>, in_length: i32): i32 {
     // next remove all -1 values in the array
     let i = -1;  // actual new index
     j = 0;  // pointer to the value in the array
-    while(j < in_length) {
-        if(edges[j] == -1) {
-            j += 1;
+    while (j < in_length) {
+        if (edges[j] == -1) {
+            j++;
         } else {
             edges[++i] = edges[j++];
         }
@@ -192,7 +178,7 @@ function remove_duplicates(edges: StaticArray<i32>, in_length: i32): i32 {
 }
 
 function remove_from_array<T>(array: StaticArray<T>, in_length: i32, remove_index: i32): i32 {
-    for(let i = remove_index + 1; i < in_length; i++) {
+    for (let i = remove_index + 1; i < in_length; i++) {
         array[i - 1] = array[i];
     }
 
@@ -202,32 +188,23 @@ function remove_from_array<T>(array: StaticArray<T>, in_length: i32, remove_inde
 export function triangulate(in_points: StaticArray<Point>): StaticArray<i32> {
     const points_count: i32 = in_points.length;
     if(points_count < 3) {
-        return new StaticArray<i32>(0);
+        return [];
     }
 
     // AS does not support closures, so, create array with extended points
-    let ext_points = new StaticArray<PointExt>(points_count);
+    let indexed_points = new StaticArray<IndexedPoint>(points_count);
     for(let i = 0; i < points_count; i++) {
         const p = in_points[i];
-        ext_points[i] = new PointExt(p.x(), p.y(), i);  // assign in dex to each point
+        indexed_points[i] = new IndexedPoint(p.x(), p.y(), i);  // assign index to each point
     }
 
     // sort by using custom comparator
-    ext_points.sort((a: PointExt, b: PointExt): i32 => {
-        if(a.x() < b.x()) {
-            return -1;
-        } else if(a.x() > b.x())
-        {
-            return 1;
-        } else {
-            return 0;
-        }
-    });
+    indexed_points.sort((a, b) => i32(a.x() > b.x()) - i32(a.x() < b.x()));
 
     // extract indices from sorted array
     let indices = new StaticArray<i32>(points_count);
     for(let i = 0; i < points_count; i++) {
-        indices[i] = ext_points[i].index();
+        indices[i] = indexed_points[i].index();
     }
 
     const st = build_supertriangle(in_points);
@@ -254,12 +231,12 @@ export function triangulate(in_points: StaticArray<Point>): StaticArray<i32> {
 
     open_list[open_list_length++] = circumcircle(points, points_count, points_count + 1, points_count + 2);
 
-    for(let i = 0; i < points_count; i++) {
+    for (let i = 0; i < points_count; i++) {
         const c: i32 = indices[i];
         const p: Point = points[c];
 
         edges_list_length = 0;
-        for(let j = open_list_length - 1; j >= 0; j--) {
+        for (let j = open_list_length - 1; j >= 0; j--) {
             const t: TriangleCircle = open_list[j];
             const dx: f32 = p.x() - t.x();
 
@@ -270,7 +247,7 @@ export function triangulate(in_points: StaticArray<Point>): StaticArray<i32> {
             }
 
             const dy: f32 = p.y() - t.y();
-            if(dx*dx + dy*dy - t.radius_sq() > EPSILON) {
+            if (dx*dx + dy*dy - t.radius_sq() > EPSILON) {
                 continue;
             }
 
@@ -286,7 +263,7 @@ export function triangulate(in_points: StaticArray<Point>): StaticArray<i32> {
         edges_list_length = remove_duplicates(edges_list, edges_list_length);
 
         let k: i32 = edges_list_length;
-        while(k >= 2) {
+        while (k >= 2) {
             const b = edges_list[--k];
             const a = edges_list[--k];
 
@@ -300,14 +277,14 @@ export function triangulate(in_points: StaticArray<Point>): StaticArray<i32> {
 
     const triangles = new StaticArray<i32>(closed_list_length * 3);
     let t_index: i32 = 0;
-    for(let i = 0; i < closed_list_length; i++) {
+    for (let i = 0; i < closed_list_length; i++) {
         const t = closed_list[i];
-        if(t.i() < points_count && t.j() < points_count && t.k() < points_count) {
+        if (t.i() < points_count && t.j() < points_count && t.k() < points_count) {
             triangles[3*t_index] = t.i();
             triangles[3*t_index + 1] = t.j();
             triangles[3*t_index + 2] = t.k();
 
-            t_index += 1;
+            t_index++;
         }
     }
     return triangles.slice<StaticArray<i32>>(0, 3*t_index);

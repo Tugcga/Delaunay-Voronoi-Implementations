@@ -18,6 +18,20 @@ export class Point {
     }
 
     toString(): string {
-        return "(" + this.m_x.toString() + ", " + this.m_y.toString() + ")";
+        return `(${this.m_x}, ${this.m_y})`;
+    }
+}
+
+export class IndexedPoint extends Point {
+    private m_index: i32;
+
+    constructor(in_x: f32, in_y: f32, in_index: i32) {
+        super(in_x, in_y);
+
+        this.m_index = in_index;
+    }
+
+    index(): i32 {
+        return this.m_index;
     }
 }
