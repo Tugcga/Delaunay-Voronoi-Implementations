@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <float.h>
 
+const float EPSILON = 0.00001f;
+
 struct TriangleCircle
 {
     // triangle point indices
@@ -113,8 +115,6 @@ TriangleCircle circumcircle(const std::vector<Point> &points, int i, int j, int 
     float mx_2 = 0.0f;
     float my_1 = 0.0f;
     float my_2 = 0.0f;
-
-    float EPSILON = 0.00001f;
 
     if (y1_y2 < EPSILON)
     {
@@ -261,6 +261,7 @@ std::vector<int> triangulate(std::vector<Point> &points)
 
     // form the output array
     std::vector<int> triangles;
+    triangles.reserve(closed_list.size() * 3);
     for (size_t i = 0; i < closed_list.size(); i++)
     {
         TriangleCircle t = closed_list[i];

@@ -3,34 +3,33 @@
 
 #include "bvh.h"
 
-Trinangle::Trinangle(const std::vector<Point> &vertices)
+Trinangle::Trinangle(const Point &in_a, const Point& in_b, const Point& in_c) : a(in_a), b(in_b), c(in_c)
 {
-	a = vertices[0];
-	b = vertices[1];
-	c = vertices[2];
-
 	float x_min = FLT_MAX;
 	float y_min = FLT_MAX;
 	float x_max = FLT_MIN;
 	float y_max = FLT_MIN;
 
-	float x_accum = 0.0f;
-	float y_accum = 0.0f;
+	if (a.x < x_min) { x_min = a.x; }
+	if (a.x > x_max) { x_max = a.x; }
+	if (a.y < y_min) { y_min = a.y; }
+	if (a.y > y_max) { y_max = a.y; }
 
-	for (size_t i = 0; i < vertices.size(); i++)
-	{
-		Point v = vertices[i];
-		if (v.x < x_min) { x_min = v.x; }
-		if (v.x > x_max) { x_max = v.x; }
-		if (v.y < y_min) { y_min = v.y; }
-		if (v.y > y_max) { y_max = v.y; }
+	if (b.x < x_min) { x_min = b.x; }
+	if (b.x > x_max) { x_max = b.x; }
+	if (b.y < y_min) { y_min = b.y; }
+	if (b.y > y_max) { y_max = b.y; }
 
-		x_accum += v.x;
-		y_accum += v.y;
-	}
+	if (c.x < x_min) { x_min = c.x; }
+	if (c.x > x_max) { x_max = c.x; }
+	if (c.y < y_min) { y_min = c.y; }
+	if (c.y > y_max) { y_max = c.y; }
+
+	float c_x = (a.x + b.x + c.x) * (1.0f / 3.0f);
+	float c_y = (a.y + b.y + c.y) * (1.0f / 3.0f);
 
 	aabb = AABB{ x_min, y_min, x_max, y_max };
-	center = Point(x_accum / vertices.size(), y_accum / vertices.size());
+	center = Point(c_x, c_y);
 }
 
 AABB Trinangle::get_aabb()
@@ -127,6 +126,8 @@ BVHNode::BVHNode(const std::vector<Trinangle*>& triangles)
 
 		std::vector<Trinangle*> left;
 		std::vector<Trinangle*> right;
+		left.reserve(objects_count);
+		right.reserve(objects_count);
 
 		for (size_t i = 0; i < objects_count; i++)
 		{

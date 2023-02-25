@@ -18,7 +18,7 @@ struct AABB
 class Trinangle
 {
 public:
-	Trinangle(const std::vector<Point>& vertices);
+	Trinangle(const Point& in_a, const Point& in_b, const Point& in_c);
 	~Trinangle() {};
 	AABB get_aabb();
 	Point get_center();

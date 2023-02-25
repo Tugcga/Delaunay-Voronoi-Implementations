@@ -1,3 +1,4 @@
+#ifndef VS_DEVELOPE
 #include <emscripten/bind.h>
 #include <emscripten/val.h>
 
@@ -7,7 +8,7 @@
 
 using namespace emscripten;
 
-emscripten::val build_triangulation(const emscripten::val &in_coordinates)
+emscripten::val build_triangulation(const emscripten::val& in_coordinates)
 {
 	// prepare input
 	const std::vector<float> coordinates = convertJSArrayToNumberVector<float>(in_coordinates);
@@ -16,7 +17,7 @@ emscripten::val build_triangulation(const emscripten::val &in_coordinates)
 	std::vector<Point> points(points_count);
 	for (size_t i = 0; i < points_count; i++)
 	{
-		points[i] = Point(coordinates[2*i], coordinates[2*i + 1]);
+		points[i] = Point(coordinates[2 * i], coordinates[2 * i + 1]);
 	}
 
 	std::vector<int> triangles = triangulate(points);
@@ -32,8 +33,8 @@ emscripten::val build_triangulation(const emscripten::val &in_coordinates)
 class BVHNodeWrapper
 {
 public:
-	BVHNodeWrapper(const emscripten::val &in_coordinates);
-	BVHNodeWrapper(const emscripten::val &in_coordinates, const emscripten::val &in_triangles);
+	BVHNodeWrapper(const emscripten::val& in_coordinates);
+	BVHNodeWrapper(const emscripten::val& in_coordinates, const emscripten::val& in_triangles);
 	~BVHNodeWrapper();
 
 	emscripten::val sample(float x, float y);
@@ -42,7 +43,7 @@ private:
 	BVHNode* bvh;
 };
 
-BVHNodeWrapper::BVHNodeWrapper(const emscripten::val &in_coordinates)
+BVHNodeWrapper::BVHNodeWrapper(const emscripten::val& in_coordinates)
 {
 	const std::vector<float> coordinates = convertJSArrayToNumberVector<float>(in_coordinates);
 
@@ -50,7 +51,7 @@ BVHNodeWrapper::BVHNodeWrapper(const emscripten::val &in_coordinates)
 	std::vector<Point> points(points_count);
 	for (size_t i = 0; i < points_count; i++)
 	{
-		points[i] = Point(coordinates[2*i], coordinates[2*i + 1]);
+		points[i] = Point(coordinates[2 * i], coordinates[2 * i + 1]);
 	}
 
 	std::vector<int> trinagle_indices = triangulate(points);
@@ -62,14 +63,13 @@ BVHNodeWrapper::BVHNodeWrapper(const emscripten::val &in_coordinates)
 		int b = trinagle_indices[3 * i + 1];
 		int c = trinagle_indices[3 * i + 2];
 
-		std::vector<Point> vertices = { points[a], points[b], points[c] };
-		trinagles[i] = new Trinangle(vertices);
+		trinagles[i] = new Trinangle(points[a], points[b], points[c]);
 	}
 
 	bvh = new BVHNode(trinagles);
 }
 
-BVHNodeWrapper::BVHNodeWrapper(const emscripten::val &in_coordinates, const emscripten::val &in_triangles)
+BVHNodeWrapper::BVHNodeWrapper(const emscripten::val& in_coordinates, const emscripten::val& in_triangles)
 {
 	const std::vector<float> coordinates = convertJSArrayToNumberVector<float>(in_coordinates);
 	const std::vector<int> triangles = convertJSArrayToNumberVector<int>(in_triangles);
@@ -82,11 +82,11 @@ BVHNodeWrapper::BVHNodeWrapper(const emscripten::val &in_coordinates, const emsc
 		int b = triangles[3 * i + 1];
 		int c = triangles[3 * i + 2];
 
-		std::vector<Point> vertices = {
-			Point(coordinates[2 * a], coordinates[2 * a + 1]),
+		triangles_array[i] = new Trinangle(
+		Point(coordinates[2 * a], coordinates[2 * a + 1]),
 			Point(coordinates[2 * b], coordinates[2 * b + 1]),
-			Point(coordinates[2 * c], coordinates[2 * c + 1]) };
-		triangles_array[i] = new Trinangle(vertices);
+			Point(coordinates[2 * c], coordinates[2 * c + 1])
+		);
 	}
 
 	bvh = new BVHNode(triangles_array);
@@ -126,3 +126,4 @@ EMSCRIPTEN_BINDINGS(delaunay_module)
 		.function("sample", &BVHNodeWrapper::sample);
 	function("build_triangulation", &build_triangulation);
 }
+#endif // !VS_DEVELOPE
